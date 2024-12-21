@@ -12,7 +12,6 @@ def load_data(fname):
     df = df.drop(columns=['Color3'])
     df = df.drop(columns=['VideoAmt'])
     df = df[df['Age'] <= 20]
-    df['Adoption'] = df['AdoptionSpeed'].apply(lambda x: 0 if x == 4 else 1)
     nc = df.shape[1] # number of columns
     matrix = df.values # Convert dataframe to darray
     table_X = matrix [:, 0:nc-1] 

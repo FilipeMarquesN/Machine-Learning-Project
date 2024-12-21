@@ -129,7 +129,7 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, accuracy_s
 def RandomF(table_X, table_y):
     X_train, X_test, y_train, y_test = train_test_split(table_X, table_y, random_state=0)
 
-    clf = RandomForestClassifier(max_depth=5, random_state=0)
+    clf = RandomForestClassifier(max_depth=10, random_state=0)
 
     clf.fit(X_train, y_train)
 
