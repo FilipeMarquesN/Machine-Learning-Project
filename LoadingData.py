@@ -15,7 +15,7 @@ def load_data(fname):
     df['Adoption'] = df['AdoptionSpeed'].apply(lambda x: 0 if x == 4 else 1)
     nc = df.shape[1] # number of columns
     matrix = df.values # Convert dataframe to darray
-    table_X = matrix [:, 0:nc-2] 
+    table_X = matrix [:, 0:nc-1] 
     table_y_AdoptionSpeed = matrix [:, nc-1] # get class (last columns)           
     features = df.columns.values[0:nc-1] 
     target_name = df.columns.values[nc-1] #get target name

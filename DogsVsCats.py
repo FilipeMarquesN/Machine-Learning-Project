@@ -98,26 +98,56 @@ table_X, table_y, features, target_name, df = load_data('PetFinder_dataset.csv')
 
 #Predict Adoption Speed
 table_X_Dogs, table_y_Dogs_Speed, features_Dogs, target_Name_Dogs, df_Dogs = loadDataAnimalType(df,2)
-table_X_Cats, table_y_Cats_Speed, features_Cats, target_Name_Cats, df_Cats = loadDataAnimalType(df,2)
+table_X_Cats, table_y_Cats_Speed, features_Cats, target_Name_Cats, df_Cats = loadDataAnimalType(df,1)
 
-#Dogs Results
-OurTree(table_X_Dogs, table_y_Dogs_Speed,15)
-knn(table_X_Dogs, table_y_Dogs_Speed,3)
-naive(table_X_Dogs, table_y_Dogs_Speed)
-#Cats Results
-OurTree(table_X_Cats, table_y_Cats_Speed,15)
-knn(table_X_Cats, table_y_Cats_Speed,3)
-naive(table_X_Cats, table_y_Cats_Speed)
+# #Dogs Results
+# OurTree(table_X_Dogs, table_y_Dogs_Speed,15)
+# knn(table_X_Dogs, table_y_Dogs_Speed,3)
+# naive(table_X_Dogs, table_y_Dogs_Speed)
+# #Cats Results
+# OurTree(table_X_Cats, table_y_Cats_Speed,15)
+# knn(table_X_Cats, table_y_Cats_Speed,3)
+# naive(table_X_Cats, table_y_Cats_Speed)
 
-#Predict Adopted
+# #Predict Adopted
 table_X_Cats_Adopted, table_y_Cats_Adopted, features_Cats_Adopted, target_Name_Cats_Adopted, df_Cats_Adopted = loadDataAdopted(df_Cats)
 table_X_Dogs_Adopted, table_y_Dogs_Adopted, features_Dogs_Adopted, target_Name_Dogs_Adopted, df_Dogs_Adopted = loadDataAdopted(df_Dogs)
 
-#Dogs Results
-OurTree(table_X_Dogs, table_y_Dogs_Adopted,15)
-knn(table_X_Dogs, table_y_Dogs_Adopted,3)
-naive(table_X_Dogs, table_y_Dogs_Adopted)
-#Cats Results
-OurTree(table_X_Cats, table_y_Cats_Adopted,15)
-knn(table_X_Cats, table_y_Cats_Adopted,3)
-naive(table_X_Cats, table_y_Cats_Adopted)
+# #Dogs Results
+# OurTree(table_X_Dogs, table_y_Dogs_Adopted,15)
+# knn(table_X_Dogs, table_y_Dogs_Adopted,3)
+# naive(table_X_Dogs, table_y_Dogs_Adopted)
+# #Cats Results
+# OurTree(table_X_Cats, table_y_Cats_Adopted,15)
+# knn(table_X_Cats, table_y_Cats_Adopted,3)
+# naive(table_X_Cats, table_y_Cats_Adopted)
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, accuracy_score
+def RandomF(table_X, table_y):
+    X_train, X_test, y_train, y_test = train_test_split(table_X, table_y, random_state=0)
+
+    clf = RandomForestClassifier(max_depth=5, random_state=0)
+
+    clf.fit(X_train, y_train)
+
+    y_train_pred = clf.predict(X_train)
+    y_test_pred = clf.predict(X_test)
+
+    print("Accuracy on training set:", accuracy_score(y_train, y_train_pred))
+    print("Accuracy on test set:", accuracy_score(y_test, y_test_pred))
+
+    cm = confusion_matrix(y_test, y_test_pred)
+
+
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
+    disp.plot()  
+    plt.title("Confusion Matrix")
+    plt.show()
+
+RandomF(table_X_Dogs, table_y_Dogs_Speed)
+RandomF(table_X_Cats, table_y_Cats_Speed)
+RandomF(table_X_Cats_Adopted, table_y_Cats_Adopted)
+RandomF(table_X_Dogs_Adopted, table_y_Dogs_Adopted)
