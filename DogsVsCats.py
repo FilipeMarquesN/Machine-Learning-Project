@@ -19,6 +19,7 @@ import matplotlib.image as mpimg
 
 
 table_X, table_y, features, target_name, df = load_data('PetFinder_dataset.csv')
+table_X, table_y, features, target_name, df = loadDataAnimalType(df,1)
 
 def display_tree(tree_to_display, feature_names, class_names, fname, figsize=(10, 10)):
     """
@@ -96,6 +97,12 @@ def knn():
                                 display_labels=knn_3.classes_)
     disp.plot()
     plt.show()
+
+#OurTree()
+#knn()
+#naive()
+table_X, table_y, features, target_name, df = load_data('PetFinder_dataset.csv')
+table_X, table_y, features, target_name, df = loadDataAnimalType(df,2)
 
 OurTree()
 knn()
