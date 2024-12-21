@@ -17,10 +17,6 @@ import pydot
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-
-table_X, table_y, features, target_name, df = load_data('PetFinder_dataset.csv')
-table_X, table_y, features, target_name, df = loadDataAnimalType(df,1)
-
 def display_tree(tree_to_display, feature_names, class_names, fname, figsize=(10, 10)):
     """
     Display a decision tree using sklearn's export_graphviz and pydot.
@@ -47,13 +43,13 @@ def display_tree(tree_to_display, feature_names, class_names, fname, figsize=(10
     plt.axis("off")  # Remover eixos
     plt.show()
 
-def OurTree():
-    clf = tree.DecisionTreeClassifier(max_leaf_nodes=15)
+def OurTree(table_X, table_y,mx_leaf_nodes):
+    clf = tree.DecisionTreeClassifier(max_leaf_nodes=mx_leaf_nodes)
     clf = clf.fit(table_X,  table_y)
 
     display_tree(clf, features, pd.Series(table_y), fname="decision_tree")
 
-def naive():
+def naive(table_X, table_y):
     # Modelo Probabilistico Naive
     gnb = GaussianNB()
     X_train, X_test, y_train, y_test = train_test_split(table_X, table_y, random_state=0)
@@ -76,8 +72,8 @@ def naive():
     plt.show()
 
 ## KNN
-def knn():
-    knn_3 = neighbors.KNeighborsClassifier(n_neighbors=3)
+def knn(table_X, table_y,numberNeighbours):
+    knn_3 = neighbors.KNeighborsClassifier(n_neighbors=numberNeighbours)
     knn_3
 
     X_train, X_test, y_train, y_test = train_test_split(table_X, table_y, random_state=0)
@@ -98,12 +94,30 @@ def knn():
     disp.plot()
     plt.show()
 
-#OurTree()
-#knn()
-#naive()
 table_X, table_y, features, target_name, df = load_data('PetFinder_dataset.csv')
-table_X, table_y, features, target_name, df = loadDataAnimalType(df,2)
 
-OurTree()
-knn()
-naive()
+#Predict Adoption Speed
+table_X_Dogs, table_y_Dogs_Speed, features_Dogs, target_Name_Dogs, df_Dogs = loadDataAnimalType(df,2)
+table_X_Cats, table_y_Cats_Speed, features_Cats, target_Name_Cats, df_Cats = loadDataAnimalType(df,2)
+
+#Dogs Results
+OurTree(table_X_Dogs, table_y_Dogs_Speed,15)
+knn(table_X_Dogs, table_y_Dogs_Speed,3)
+naive(table_X_Dogs, table_y_Dogs_Speed)
+#Cats Results
+OurTree(table_X_Cats, table_y_Cats_Speed,15)
+knn(table_X_Cats, table_y_Cats_Speed,3)
+naive(table_X_Cats, table_y_Cats_Speed)
+
+#Predict Adopted
+table_X_Cats_Adopted, table_y_Cats_Adopted, features_Cats_Adopted, target_Name_Cats_Adopted, df_Cats_Adopted = loadDataAdopted(df_Cats)
+table_X_Dogs_Adopted, table_y_Dogs_Adopted, features_Dogs_Adopted, target_Name_Dogs_Adopted, df_Dogs_Adopted = loadDataAdopted(df_Dogs)
+
+#Dogs Results
+OurTree(table_X_Dogs, table_y_Dogs_Adopted,15)
+knn(table_X_Dogs, table_y_Dogs_Adopted,3)
+naive(table_X_Dogs, table_y_Dogs_Adopted)
+#Cats Results
+OurTree(table_X_Cats, table_y_Cats_Adopted,15)
+knn(table_X_Cats, table_y_Cats_Adopted,3)
+naive(table_X_Cats, table_y_Cats_Adopted)
