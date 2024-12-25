@@ -36,9 +36,17 @@ def display_tree(tree_to_display, feature_names, class_names, fname, figsize=(10
     plt.axis("off")  # Remover eixos
     plt.show()
 
-def OurTree(table_X, table_y,mx_leaf_nodes):
+def OurTree(table_X, table_y,mx_leaf_nodes,features):
+    
+    X_train, X_test, y_train, y_test = train_test_split(table_X, table_y, random_state=0)
     clf = tree.DecisionTreeClassifier(max_leaf_nodes=mx_leaf_nodes)
-    clf = clf.fit(table_X,  table_y)
+    clf = clf.fit(X_train, y_train)
+
+    y_train_pred = clf.predict(X_train)
+    y_test_pred = clf.predict(X_test)
+
+    print("Accuracy on training set:", accuracy_score(y_train, y_train_pred))
+    print("Accuracy on test set:", accuracy_score(y_test, y_test_pred))
 
     display_tree(clf, features, pd.Series(table_y), fname="decision_tree")
 
@@ -103,7 +111,8 @@ def RandomF(table_X, table_y):
     cm = confusion_matrix(y_test, y_test_pred)
 
 
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
-    disp.plot()  
-    plt.title("Confusion Matrix")
-    plt.show()
+    # disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
+    # disp.plot()  
+    # plt.title("Confusion Matrix")
+    # plt.show()
+    return accuracy_score(y_train, y_train_pred), accuracy_score(y_test, y_test_pred)
