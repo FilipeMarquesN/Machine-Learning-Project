@@ -133,3 +133,17 @@ def RandomF(table_X, table_y):
     cv_scores = cross_val_score(best_clf, table_X, table_y, cv=5)
     print(f"Cross-validation scores: {cv_scores}")
     print(f"Mean cross-validation score: {cv_scores.mean()}")
+
+def OurKmeans(df,table_X, n_clusters=8):
+
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    df = kmeans.fit_predict(table_X)  
+    
+    if table_X.shape[1] == 2:
+        plt.scatter(table_X[:, 0], table_X[:, 1], c=df_scaled['Cluster'], cmap='viridis')
+        plt.xlabel('Feature 1')
+        plt.ylabel('Feature 2')
+        plt.title('K-Means')
+        plt.show()
+    
+    return df_scaled, kmeans
