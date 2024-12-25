@@ -1,14 +1,15 @@
 from LoadingData import * 
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn import neighbors, tree
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, accuracy_score
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, classification_report, accuracy_score
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
 import pydot
+import seaborn as sns
 
 def display_tree(tree_to_display, feature_names, class_names, fname, figsize=(10, 10)):
     """
@@ -37,7 +38,7 @@ def display_tree(tree_to_display, feature_names, class_names, fname, figsize=(10
     plt.show()
 
 def OurTree(table_X, table_y,mx_leaf_nodes,features):
-    
+
     X_train, X_test, y_train, y_test = train_test_split(table_X, table_y, random_state=0)
     clf = tree.DecisionTreeClassifier(max_leaf_nodes=mx_leaf_nodes)
     clf = clf.fit(X_train, y_train)
@@ -96,23 +97,39 @@ def knn(table_X, table_y,numberNeighbours):
     plt.show()
 
 def RandomF(table_X, table_y):
-    X_train, X_test, y_train, y_test = train_test_split(table_X, table_y, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(table_X, table_y, random_state=0, stratify=table_y)
 
-    clf = RandomForestClassifier(max_depth=10, random_state=0)
 
-    clf.fit(X_train, y_train)
+    clf = RandomForestClassifier(random_state=0, class_weight='balanced')
 
-    y_train_pred = clf.predict(X_train)
-    y_test_pred = clf.predict(X_test)
+    param_grid = {
+        'n_estimators': [50, 100, 200],         
+        'max_depth': [5, 10, 30, None],         
+        'min_samples_split': [10, 5, 10],       
+        'min_samples_leaf': [1, 2, 4],          
+        'max_features': ['auto', 'sqrt', 'log2'],  
+    }
+
+    grid_search = GridSearchCV(clf, param_grid, cv=5, n_jobs=-1, verbose=0)
+    grid_search.fit(X_train, y_train)
+
+    best_clf = grid_search.best_estimator_
+
+    y_train_pred = best_clf.predict(X_train)
+    y_test_pred = best_clf.predict(X_test)
 
     print("Accuracy on training set:", accuracy_score(y_train, y_train_pred))
     print("Accuracy on test set:", accuracy_score(y_test, y_test_pred))
 
+    print("\nClassification Report on test set:")
+    print(classification_report(y_test, y_test_pred))
+
     cm = confusion_matrix(y_test, y_test_pred)
+    
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=best_clf.classes_) 
+    plt.title("Confusion Matrix")
+    plt.show()
 
-
-    # disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
-    # disp.plot()  
-    # plt.title("Confusion Matrix")
-    # plt.show()
-    return accuracy_score(y_train, y_train_pred), accuracy_score(y_test, y_test_pred)
+    cv_scores = cross_val_score(best_clf, table_X, table_y, cv=5)
+    print(f"Cross-validation scores: {cv_scores}")
+    print(f"Mean cross-validation score: {cv_scores.mean()}")
