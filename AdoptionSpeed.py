@@ -15,10 +15,13 @@ import matplotlib.pyplot as plt
 from sklearn import tree
 import pydot
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
+import matplotlib.pyplot as mpimg
+from sklearn.svm import LinearSVC
+from sklearn.svm import LinearSVC
 
 
-table_X, table_y, features, target_name, df = load_data('PetFinder_dataset.csv')
+table_X, table_y_adoptionspeed, features, target_name, df = load_data('PetFinder_dataset.csv')
+
 
 def display_tree(tree_to_display, feature_names, class_names, fname, figsize=(10, 10)):
     """
@@ -48,14 +51,14 @@ def display_tree(tree_to_display, feature_names, class_names, fname, figsize=(10
 
 def OurTree():
     clf = tree.DecisionTreeClassifier(max_leaf_nodes=15)
-    clf = clf.fit(table_X,  table_y)
+    clf = clf.fit(table_X,  table_y_adoptionspeed)
 
-    display_tree(clf, features, pd.Series(table_y), fname="decision_tree")
+    display_tree(clf, features, pd.Series(table_y_adoptionspeed), fname="decision_tree")
 
 def naive():
     # Modelo Probabilistico Naive
     gnb = GaussianNB()
-    X_train, X_test, y_train, y_test = train_test_split(table_X, table_y, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(table_X, table_y_adoptionspeed, random_state=0)
 
     print(X_train.shape)
     print(X_test.shape)
@@ -79,7 +82,7 @@ def knn():
     knn_3 = neighbors.KNeighborsClassifier(n_neighbors=3)
     knn_3
 
-    X_train, X_test, y_train, y_test = train_test_split(table_X, table_y, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(table_X, table_y_adoptionspeed, random_state=0)
     knn_3 = knn_3.fit(X_train, y_train)
     print("Accuracy on training set:",  knn_3.score(X_train, y_train))
     print("Accuracy on test set:",  knn_3.score(X_test, y_test))
@@ -96,7 +99,19 @@ def knn():
                                 display_labels=knn_3.classes_)
     disp.plot()
     plt.show()
+#SVM 
+def svm():
+    X_train, X_test, y_train, y_test = train_test_split(table_X, table_y_adoptionspeed, random_state=0)
+    lsvm = LinearSVC(dual = 'auto').fit(X_train, y_train) 
+    print("Training set score (Accuracy) =", lsvm.score(X_train, y_train))
+    print("Test set score (Accuracy) =", lsvm.score(X_test, y_test))
+    print('---'*30)
+    #Não sei se é necessário
+    print ("LinearSVC coefficients and intercept:")
+    print ("Coeficients (w) =\n", lsvm.coef_)
+    print ("Intercept (b) =", lsvm.intercept_)
 
+svm()
 OurTree()
 knn()
 naive()
