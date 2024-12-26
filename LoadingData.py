@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
+from sklearn import preprocessing
 
 def load_data(fname):
     """Load CSV file with any number of consecutive features, starting in column 0, where last column is the class"""
@@ -71,17 +71,17 @@ def loadDataAnimalType(df,number):
     
     return table_X, table_y, features, target_name, df
 
+import pandas as pd
+from sklearn import preprocessing
 
 def loadScaledData(df):
-    scaler = StandardScaler()
-    df[['Breed1', 'State']] = scaler.fit_transform(df[['Breed1', 'State']])
-
-    nc = df.shape[1] 
-    matrix = df.values 
+    nc = df.shape[1]
+    matrix = df.values
     table_X = matrix[:, 0:nc-1]
     table_y_AdoptionSpeed = matrix[:, nc-1]
-
+    X_scaled = preprocessing.scale(table_X)
     features = df.columns.values[0:nc-1]
+    df_scaled = pd.DataFrame(X_scaled, columns=features)
     target_name = df.columns.values[nc-1]
     
-    return table_X, table_y_AdoptionSpeed, features, target_name, df
+    return X_scaled, table_y_AdoptionSpeed, features, target_name, df_scaled

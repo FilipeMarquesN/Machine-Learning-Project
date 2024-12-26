@@ -4,12 +4,15 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn import neighbors, tree
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, classification_report, accuracy_score
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, classification_report, accuracy_score, adjusted_rand_score, silhouette_score
+from sklearn.cluster import KMeans, AgglomerativeClustering
+from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
 import pydot
 import seaborn as sns
+from sklearn import metrics
 
 def display_tree(tree_to_display, feature_names, class_names, fname, figsize=(10, 10)):
     """
@@ -84,10 +87,8 @@ def knn(table_X, table_y,numberNeighbours):
     print("Accuracy on test set:",  knn_3.score(X_test, y_test))
 
     y_train_pred = knn_3.predict(X_train)
-    y_train_pred
 
     cm_train = confusion_matrix(y_train, y_train_pred, labels=knn_3.classes_)
-    print (cm_train)
     #%matplotlib inline
     cm_train = confusion_matrix(y_train, y_train_pred)
 
@@ -134,16 +135,14 @@ def RandomF(table_X, table_y):
     print(f"Cross-validation scores: {cv_scores}")
     print(f"Mean cross-validation score: {cv_scores.mean()}")
 
-def OurKmeans(df,table_X, n_clusters=8):
-
-    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-    df = kmeans.fit_predict(table_X)  
-    
-    if table_X.shape[1] == 2:
-        plt.scatter(table_X[:, 0], table_X[:, 1], c=df_scaled['Cluster'], cmap='viridis')
-        plt.xlabel('Feature 1')
-        plt.ylabel('Feature 2')
-        plt.title('K-Means')
-        plt.show()
-    
-    return df_scaled, kmeans
+def OurKmeans(table_X,table_y, nclusters=8):
+    kms = KMeans(nclusters, random_state=0, n_init='auto')
+    kms = kms.fit(table_X)
+    predicted_labels = kms.labels_
+    hca = AgglomerativeClustering(linkage="ward", n_clusters=nclusters).fit(table_X)
+    print("Kmeans silhouette_score", metrics.silhouette_score(table_X, kms.labels_))
+    print("HCA silhouette_score", metrics.silhouette_score(table_X, hca.labels_))
+    ari_score = adjusted_rand_score(table_y, predicted_labels)
+    print(f"Adjusted Rand Index (ARI): {ari_score}")
+    score = silhouette_score(table_X, predicted_labels)
+    print(f"Silhouette Score: {score}")
