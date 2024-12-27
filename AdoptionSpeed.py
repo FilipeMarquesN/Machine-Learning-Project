@@ -17,10 +17,10 @@ import pydot
 import matplotlib.pyplot as plt
 import matplotlib.pyplot as mpimg
 from sklearn.svm import LinearSVC
-from sklearn.svm import LinearSVC
 
 
-table_X, table_y_adoptionspeed, features, target_name, df = load_data('PetFinder_dataset.csv')
+
+table_X, table_y_adoptionspeed, features, target_name, df = load_data(r'C:\Users\leono_sg\OneDrive\Desktop\FCUL\AA\Projeto_AA\PetFinder_dataset.csv')
 
 
 def display_tree(tree_to_display, feature_names, class_names, fname, figsize=(10, 10)):
@@ -111,7 +111,4 @@ def svm():
     print ("Coeficients (w) =\n", lsvm.coef_)
     print ("Intercept (b) =", lsvm.intercept_)
 
-svm()
-OurTree()
-knn()
-naive()
+

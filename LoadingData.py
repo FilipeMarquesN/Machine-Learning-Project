@@ -71,8 +71,6 @@ def loadDataAnimalType(df,number):
     
     return table_X, table_y, features, target_name, df
 
-import pandas as pd
-from sklearn import preprocessing
 
 def loadScaledData(df):
     nc = df.shape[1]

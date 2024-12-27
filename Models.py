@@ -135,6 +135,7 @@ def RandomF(table_X, table_y):
     print(f"Cross-validation scores: {cv_scores}")
     print(f"Mean cross-validation score: {cv_scores.mean()}")
 
+
 def OurKmeans(table_X,table_y, nclusters=8):
     kms = KMeans(nclusters, random_state=0, n_init='auto')
     kms = kms.fit(table_X)
