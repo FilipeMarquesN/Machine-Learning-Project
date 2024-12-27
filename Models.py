@@ -34,11 +34,10 @@ def display_tree(tree_to_display, feature_names, class_names, fname, figsize=(10
     (graph,) = pydot.graph_from_dot_data(dot_data)
     graph.write_png(fname + ".png")  # Salvar como imagem PNG
 
-    # Exibir a imagem usando matplotlib
     img = mpimg.imread(fname + ".png")
     plt.figure(figsize=figsize)
     plt.imshow(img)
-    plt.axis("off")  # Remover eixos
+    plt.axis("off") 
     plt.show()
 
 def OurTree(table_X, table_y,mx_leaf_nodes,features):
@@ -100,15 +99,16 @@ def Ourknn(table_X, table_y,numberNeighbours):
     plt.show()
 
 def RandomF(table_X, table_y):
-    X_train, X_test, y_train, y_test = train_test_split(table_X, table_y, random_state=0, stratify=table_y)
+    X_train, X_test, y_train, y_test = train_test_split(
+        table_X, table_y, random_state=0, stratify=table_y
+    )
 
-
-    clf = RandomForestClassifier(random_state=0, class_weight='balanced')
+    clf = RandomForestClassifier(random_state=0, class_weight="balanced")
 
     param_grid = {
-        'n_estimators': [25, 50, 100],         
-        'max_depth': [5, 8, 10, None],    
-        'min_samples_leaf': [1, 2, 10]
+        "n_estimators": [25, 50, 100],
+        "max_depth": [3, 5,20],
+        "min_samples_leaf": [10, 15, 20]
     }
 
     grid_search = GridSearchCV(clf, param_grid, cv=5, n_jobs=-1, verbose=0)
@@ -121,14 +121,16 @@ def RandomF(table_X, table_y):
 
     print("Accuracy on training set:", accuracy_score(y_train, y_train_pred))
     print("Accuracy on test set:", accuracy_score(y_test, y_test_pred))
-    
 
     cm = confusion_matrix(y_test, y_test_pred)
-    
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=best_clf.classes_) 
+    print("Confusion Matrix:\n", cm)
+
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=best_clf.classes_)
+    disp.plot(cmap="viridis")  # Specify a colormap for better visualization
     plt.title("Confusion Matrix")
     plt.show()
-    crossValidation(table_X,table_y,10,best_clf)
+
+    crossValidation(table_X, table_y, 10, best_clf)
 
 def OurKmeans(table_X,table_y, nclusters=8):
     kms = KMeans(nclusters, random_state=0, n_init='auto')
@@ -139,8 +141,21 @@ def OurKmeans(table_X,table_y, nclusters=8):
     print("HCA silhouette_score", metrics.silhouette_score(table_X, hca.labels_))
     ari_score = adjusted_rand_score(table_y, predicted_labels)
     print(f"Adjusted Rand Index (ARI): {ari_score}")
-    score = silhouette_score(table_X, predicted_labels)
-    print(f"Silhouette Score: {score}")
+
+def OurBiCluster(table_X, table_y, nclusters=8):
+    spectral_clustering = SpectralCoclustering(n_clusters=nclusters, random_state=0)
+    spectral_clustering.fit(table_X)
+    spectral_row_labels = spectral_clustering.row_labels_
+    spectral_column_labels = spectral_clustering.column_labels_ 
+    hca = AgglomerativeClustering(linkage="ward", n_clusters=nclusters)
+    hca_row_labels = hca.fit_predict(table_X) 
+    silhouette_spectral_rows = silhouette_score(table_X, spectral_row_labels)
+    silhouette_spectral_columns = silhouette_score(table_X.T, spectral_column_labels)
+    print("Spectral Co-clustering Silhouette Score for rows:", silhouette_spectral_rows)
+    print("Spectral Co-clustering Silhouette Score for columns:", silhouette_spectral_columns)  
+    print("HCA Silhouette Score for rows:", silhouette_score(table_X, hca_row_labels))
+    ari_row_score = adjusted_rand_score(table_y, spectral_row_labels)
+    print(f"Adjusted Rand Index (ARI) for row clustering from Spectral Co-clustering: {ari_row_score}")
 
 def svm(table_X,table_y):
     X_train, X_test, y_train, y_test = train_test_split(table_X, table_y, random_state=0)
