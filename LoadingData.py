@@ -26,20 +26,13 @@ def loadDataAdopted(df):
     Load CSV file with any number of consecutive features, starting in column 0, 
     where the last column is the class.
     """
-
-    df['AdoptionSpeed'] = df['AdoptionSpeed'].apply(lambda x: 0 if x == 4 else 1)
-    
-
+    Adopted = df['AdoptionSpeed'].apply(lambda x: 0 if x == 4 else 1)
+    df = df.drop(columns=['AdoptionSpeed'])
+    df['Adopted'] = Adopted
     nc = df.shape[1]
-    
-
     matrix = df.values
-    
-
     table_X = matrix[:, 0:nc-1] 
     table_y_Adoption = matrix[:, nc-1]    
-    
-
     features = df.columns.values[0:nc-1]  # Nomes das colunas (features)
     target_name = df.columns.values[nc-1]  # Nome da classe alvo
     
@@ -54,18 +47,10 @@ def loadDataAnimalType(df,number):
 
 
     df = df[df['Type'] == number]
-    
-
     nc = df.shape[1]
-    
-
     matrix = df.values
-    
-
     table_X = matrix[:, 0:nc-1] 
-    table_y = matrix[:, nc-1]    
-    
-
+    table_y = matrix[:, nc-1]   
     features = df.columns.values[0:nc-1]  # Nomes das colunas (features)
     target_name = df.columns.values[nc-1]  # Nome da classe alvo
     
