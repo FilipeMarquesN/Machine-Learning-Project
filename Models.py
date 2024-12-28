@@ -1,7 +1,7 @@
 from LoadingData import * 
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score, StratifiedKFold
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, classification_report, accuracy_score, adjusted_rand_score, silhouette_score
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, classification_report, accuracy_score, adjusted_rand_score, silhouette_score, recall_score, precision_score
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
@@ -49,7 +49,7 @@ def OurTree(table_X, table_y,mx_leaf_nodes,features):
 
     print("Accuracy on training set:", accuracy_score(y_train, y_train_pred))
     print("Accuracy on test set:", accuracy_score(y_test, y_test_pred))
-    
+
     crossValidation(table_X,table_y,10,clf)
     display_tree(clf, features, pd.Series(table_y), fname="decision_tree")
 
@@ -64,13 +64,21 @@ def naive(table_X, table_y):
     crossValidation(table_X,table_y,10,gnb)
     y_train_pred = gnb.predict(X_train)
     y_train_pred
-    #%matplotlib inline
-
     cm_train = confusion_matrix(y_train, y_train_pred)
-
     disp = ConfusionMatrixDisplay(confusion_matrix=cm_train,
                                 display_labels=gnb.classes_)
     disp.plot(cmap='Oranges') 
+    plt.title("Confusion Matrix - Train Set")
+    plt.show()
+
+    # predictions for test set
+    y_test_pred = gnb.predict(X_test)
+    y_test_pred
+    cm_test = confusion_matrix(y_test, y_test_pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm_test,
+                                display_labels=gnb.classes_)
+    disp.plot(cmap='Oranges')
+    plt.title("Confusion Matrix - Test Set")
     plt.show()
 
 ## KNN
@@ -85,13 +93,20 @@ def Ourknn(table_X, table_y,numberNeighbours):
     crossValidation(table_X,table_y,10,knn)
     y_train_pred = knn.predict(X_train)
 
-    cm_train = confusion_matrix(y_train, y_train_pred, labels=knn.classes_)
-    #%matplotlib inline
     cm_train = confusion_matrix(y_train, y_train_pred)
-
     disp = ConfusionMatrixDisplay(confusion_matrix=cm_train,
                               display_labels=knn.classes_)
-    disp.plot(cmap='Oranges') 
+    disp.plot(cmap='Oranges')
+    plt.title("Confusion Matrix - Train Set") 
+    plt.show()
+
+    y_test_pred = knn.predict(X_test)
+    y_test_pred
+    cm_test = confusion_matrix(y_test, y_test_pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm_test,
+                                display_labels=knn.classes_)
+    disp.plot(cmap='Oranges')
+    plt.title("Confusion Matrix - Test Set")
     plt.show()
 
 def RandomF(table_X, table_y):
@@ -192,6 +207,7 @@ def svm(table_X,table_y):
     print ("LinearSVC coefficients and intercept:")
     print ("Coeficients (w) =\n", lsvm.coef_)
     print ("Intercept (b) =", lsvm.intercept_)
+    
 
 # Logistic Regression
 
