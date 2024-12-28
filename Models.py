@@ -2,12 +2,13 @@ from LoadingData import *
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score, StratifiedKFold
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, classification_report, accuracy_score, adjusted_rand_score, silhouette_score
+from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn import neighbors, tree
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import LinearSVC
-from sklearn.cluster import KMeans, AgglomerativeClustering
+from sklearn.cluster import KMeans, AgglomerativeClustering, SpectralCoclustering
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import seaborn as sns
@@ -58,9 +59,6 @@ def naive(table_X, table_y):
     # Modelo Probabilistico Naive
     gnb = GaussianNB()
     X_train, X_test, y_train, y_test = train_test_split(table_X, table_y, random_state=0)
-
-    print(X_train.shape)
-    print(X_test.shape)
     gnb = gnb.fit(X_train, y_train)
     gnb.predict_proba(X_train)
     print("Accuracy on training set:",  gnb.score(X_train, y_train))
@@ -123,8 +121,6 @@ def RandomF(table_X, table_y):
     print("Accuracy on test set:", accuracy_score(y_test, y_test_pred))
 
     cm = confusion_matrix(y_test, y_test_pred)
-    print("Confusion Matrix:\n", cm)
-
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=best_clf.classes_)
     disp.plot(cmap="viridis")  # Specify a colormap for better visualization
     plt.title("Confusion Matrix")
@@ -171,40 +167,23 @@ def svm(table_X,table_y):
 
 # Logistic Regression
 
-def logreg(table_X,table_y_Adopted):
+def logreg(table_X,table_y,df,features):
     df.head()
     print(df.shape)
-
-    #import numpy as np
     print(df['Adopted'].value_counts())
     np.bincount(df['Adopted'])
-
-    #from sklearn.model_selection import train_test_split
-
-    #table_X_train, table_X_test, table_y_adopted_train, table_y_adopted_test = train_test_split(table_X, table_y_adopted, test_size=0.3, random_state=42)
-    X_train, X_test, y_train, y_test = train_test_split(table_X, table_y_adopted, test_size=0.3, random_state=42)
-
-    crossValidation(table_X, table_y_adopted, 10, LogisticRegression(solver='liblinear'))
-
-    #from sklearn.linear_model import LogisticRegression
-
+    X_train, X_test, y_train, y_test = train_test_split(table_X, table_y, test_size=0.3, random_state=0)
+    crossValidation(table_X, table_y, 10, LogisticRegression(solver='liblinear'))
     petfinder_logreg = LogisticRegression(solver='liblinear').fit(X_train, y_train)
     petfinder_logreg
-
     print("Train set score (Accuracy)=", petfinder_logreg.score(X_train, y_train))
     print("Test set score (Accuracy)=", petfinder_logreg.score(X_test, y_test))
-
     petfinder_logreg100 = LogisticRegression(C=100,solver='liblinear').fit(X_train, y_train)
     print("Train set score (Accuracy)=", petfinder_logreg100.score(X_train, y_train))
     print("Test set score (Accuracy)=", petfinder_logreg100.score(X_test, y_test))
-
     petfinder_logreg001 = LogisticRegression(C=0.001,solver='liblinear').fit(X_train, y_train)
     print("Train set score (Accuracy)=", petfinder_logreg001.score(X_train, y_train))
     print("Test set score (Accuracy)=", petfinder_logreg001.score(X_test, y_test))
-
-
-    #import matplotlib.pyplot as plt
-
     nc = df.shape[1] 
 
     plt.plot(petfinder_logreg.coef_.T, 'o', label="C=1")
@@ -219,23 +198,16 @@ def logreg(table_X,table_y_Adopted):
     plt.ylabel("Coefficient magnitude")
     plt.legend()
 
-    #Plotting the coefficients
-
-    #import seaborn as sns
-
     plt.figure(figsize=(8,8))
     sns.barplot(x=features, y=petfinder_logreg.coef_.flatten())
     plt.xticks(rotation=90)
     plt.show()
-
-    #import matplotlib.pyplot as plt
-
     for C, marker in zip([0.001, 1, 100], ['o', '^', 'v']):
-        petfinder_lr_l1 = LogisticRegression(C=C, penalty="l1",max_iter=200,solver='liblinear').fit(table_X_train, table_y_adopted_train)
+        petfinder_lr_l1 = LogisticRegression(C=C, penalty="l1",max_iter=200,solver='liblinear').fit(X_train, y_train)
         print("Train accuracy of L1 logreg with C={:.3f} = {:.2f}".format(
-            C, petfinder_lr_l1.score(table_X_train, table_y_adopted_train)))
+            C, petfinder_lr_l1.score(X_train, y_train)))
         print("Test accuracy of L1 logreg with C={:.3f} = {:.2f}".format(
-            C, petfinder_lr_l1.score(table_X_test, table_y_adopted_test)))
+            C, petfinder_lr_l1.score(X_test, y_test)))
         plt.plot(petfinder_lr_l1.coef_.T, marker, label="C={:.3f}".format(C))
 
     plt.xticks(range(len(features)), features, rotation=90)
@@ -244,33 +216,19 @@ def logreg(table_X,table_y_Adopted):
     plt.xlim(xlims)
     plt.xlabel("Feature")
     plt.ylabel("Coefficient magnitude")
-
     plt.ylim(-5, 5)
     plt.legend(loc=3)
-
-    #The next plot will measure the impact of different C values. 
-
-    #We will iterate over 1000 possible values, train a classifier for each of them, and then measure the train accuracy and plot the information.
-
     c_values = np.linspace(0.01, 100, 1000)
     train_acc = np.zeros(1000)
-
     for i, c in enumerate(c_values):
         petfinder_logreg = LogisticRegression(C=c,solver='liblinear').fit(X_train, y_train)
         train_acc[i] = petfinder_logreg.score(X_train, y_train)
-
-    #import matplotlib.pyplot as plt
 
     plt.plot(c_values, train_acc)
     plt.xlabel("C")
     plt.ylabel("Train Accuracy")
 
     c_values[np.argmax(train_acc)]
-
-    #import pandas as pd
-    #import matplotlib.pyplot as plt
-    #import seaborn as sns
-
     df['PhotoAmt'] = df['PhotoAmt']  
     df['Adopted'] = df['Adopted']  
 
