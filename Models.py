@@ -49,6 +49,7 @@ def OurTree(table_X, table_y,mx_leaf_nodes,features):
 
     print("Accuracy on training set:", accuracy_score(y_train, y_train_pred))
     print("Accuracy on test set:", accuracy_score(y_test, y_test_pred))
+    
     crossValidation(table_X,table_y,10,clf)
     display_tree(clf, features, pd.Series(table_y), fname="decision_tree")
 
@@ -125,15 +126,45 @@ def RandomF(table_X, table_y):
 
     crossValidation(table_X, table_y, 10, best_clf)
 
-def OurKmeans(table_X,table_y, nclusters=8):
-    kms = KMeans(nclusters, random_state=0, n_init='auto')
+from sklearn.cluster import KMeans, AgglomerativeClustering
+from sklearn import metrics
+from sklearn.metrics import adjusted_rand_score
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+def OurKmeans(table_X, table_y, nclusters=8):
+    # KMeans Clustering
+    kms = KMeans(n_clusters=nclusters, random_state=0, n_init='auto')
     kms = kms.fit(table_X)
-    predicted_labels = kms.labels_
+    kmeans_labels = kms.labels_
+    print("Kmeans silhouette_score:", metrics.silhouette_score(table_X, kmeans_labels))
+    ari_score_kmeans = adjusted_rand_score(table_y, kmeans_labels)
+    print(f"Kmeans Adjusted Rand Index (ARI): {ari_score_kmeans}")
+    
     hca = AgglomerativeClustering(linkage="ward", n_clusters=nclusters).fit(table_X)
-    print("Kmeans silhouette_score", metrics.silhouette_score(table_X, kms.labels_))
-    print("HCA silhouette_score", metrics.silhouette_score(table_X, hca.labels_))
-    ari_score = adjusted_rand_score(table_y, predicted_labels)
-    print(f"Adjusted Rand Index (ARI): {ari_score}")
+    hca_labels = hca.labels_
+    print("HCA silhouette_score:", metrics.silhouette_score(table_X, hca_labels))
+    ari_score_hca = adjusted_rand_score(table_y, hca_labels)
+    print(f"HCA Adjusted Rand Index (ARI): {ari_score_hca}")
+
+    contingency_kmeans = pd.crosstab(kmeans_labels, table_y)
+    contingency_hca = pd.crosstab(hca_labels, table_y)
+   
+    sns.heatmap(contingency_kmeans, annot=True, fmt="d", cmap="Oranges")
+    plt.title(f"K-Means Clustering (n={nclusters}) vs Target")
+    plt.xlabel("Target")
+    plt.ylabel("Cluster")
+    plt.show()
+    
+    sns.heatmap(contingency_hca, annot=True, fmt="d", cmap="Purples")
+    plt.title(f"HCA Clustering (n={nclusters}) vs Target")
+    plt.xlabel("Target")
+    plt.ylabel("Cluster")
+    plt.show()
+
+    
+
 
 def OurBiCluster(table_X, table_y, nclusters=8):
     spectral_clustering = SpectralCoclustering(n_clusters=nclusters, random_state=0)
