@@ -17,9 +17,6 @@ import pydot
 from sklearn import metrics
 
 def display_tree(tree_to_display, feature_names, class_names, fname, figsize=(10, 10)):
-    """
-    Display a decision tree using sklearn's export_graphviz and pydot.
-    """
 
     class_names = [str(name) for name in class_names.unique()]
     dot_data = tree.export_graphviz(
