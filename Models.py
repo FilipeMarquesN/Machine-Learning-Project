@@ -69,7 +69,7 @@ def naive(table_X, table_y):
 
     disp = ConfusionMatrixDisplay(confusion_matrix=cm_train,
                                 display_labels=gnb.classes_)
-    disp.plot()
+    disp.plot(cmap='Oranges') 
     plt.show()
 
 ## KNN
@@ -89,8 +89,8 @@ def Ourknn(table_X, table_y,numberNeighbours):
     cm_train = confusion_matrix(y_train, y_train_pred)
 
     disp = ConfusionMatrixDisplay(confusion_matrix=cm_train,
-                                display_labels=knn.classes_)
-    disp.plot()
+                              display_labels=knn.classes_)
+    disp.plot(cmap='Oranges') 
     plt.show()
 
 def RandomF(table_X, table_y):
@@ -119,7 +119,7 @@ def RandomF(table_X, table_y):
 
     cm = confusion_matrix(y_test, y_test_pred)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=best_clf.classes_)
-    disp.plot(cmap="viridis")  # Specify a colormap for better visualization
+    disp.plot(cmap='Oranges') 
     plt.title("Confusion Matrix")
     plt.show()
 
